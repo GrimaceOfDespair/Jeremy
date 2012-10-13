@@ -2098,6 +2098,32 @@ namespace TinyIoC
             }
         }
 
+        private class EnumerableFactory : ObjectFactoryBase
+        {
+            private readonly Type _elementType;
+            private readonly Type _enumerableType;
+
+            public EnumerableFactory(Type elementType)
+            {
+                _elementType = elementType;
+                _enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
+            }
+
+            public override Type CreatesType { get { return _enumerableType; } }
+
+            public override object GetObject(TinyIoCContainer container, NamedParameterOverloads parameters, ResolveOptions options)
+            {
+                try
+                {
+                    return container.ResolveAll(_elementType);
+                }
+                catch (Exception ex)
+                {
+                    throw new TinyIoCResolutionException(_enumerableType, ex);
+                }
+            }
+        }
+
         /// <summary>
         /// IObjectFactory that invokes a specified delegate to construct the object
         /// </summary>
@@ -2641,10 +2667,9 @@ namespace TinyIoC
                     if (!ignoreDuplicateImplementations && implementations.Count() > 1)
                         throw new TinyIoCAutoRegistrationException(type, implementations);
 
-                    var firstImplementation = implementations.FirstOrDefault();
-                    if (firstImplementation != null)
+                    foreach (var implementation in implementations)
                     {
-                        Type[] genericTypes = { type, firstImplementation };
+                        Type[] genericTypes = { type, implementation };
                         var genericDefaultFactoryMethod = defaultFactoryMethod.MakeGenericMethod(genericTypes);
                         try
                         {
@@ -2654,6 +2679,12 @@ namespace TinyIoC
                         {
                             // Ignore methods we can't access - added for Silverlight
                         }
+                    }
+
+                    if (implementations.Count() > 1)
+                    {
+                        var enumerable = typeof(IEnumerable<>).MakeGenericType(type);
+                        RegisterInternal(enumerable, string.Empty, new EnumerableFactory(type));
                     }
                 }
             }
@@ -2698,7 +2729,7 @@ namespace TinyIoC
 
             if (registrationPredicate != null)
             {
-                ignoreChecks.Add(t => !registrationPredicate(t));    
+                ignoreChecks.Add(t => !registrationPredicate(t));
             }
 
             foreach (var check in ignoreChecks)
@@ -3012,25 +3043,25 @@ namespace TinyIoC
         {
             var genericResolveAllMethod = this.GetType().GetGenericMethod(BindingFlags.Public | BindingFlags.Instance, "ResolveAll", type.GetGenericArguments(), new[] { typeof(bool) });
 
-//#if GETPARAMETERS_OPEN_GENERICS
-//            // Using MakeGenericMethod (slow) because we need to
-//            // cast the IEnumerable or constructing the type wil fail.
-//            // We may as well use the ResolveAll<ResolveType> public
-//            // method to do this.
-//            var resolveAllMethod = this.GetType().GetMethod("ResolveAll", new Type[] { });
-//            var genericResolveAllMethod = resolveAllMethod.MakeGenericMethod(type.GetGenericArguments()[0]);
-//#else
-//            var resolveAllMethods =    from member in this.GetType().GetMembers()
-//                                       where member.MemberType == MemberTypes.Method
-//                                       where member.Name == "ResolveAll"
-//                                       let method = member as MethodInfo
-//                                       where method.IsGenericMethod
-//                                       let genericMethod = method.MakeGenericMethod(type.GetGenericArguments()[0])
-//                                       where genericMethod.GetParameters().Count() == 0
-//                                       select genericMethod;
+            //#if GETPARAMETERS_OPEN_GENERICS
+            //            // Using MakeGenericMethod (slow) because we need to
+            //            // cast the IEnumerable or constructing the type wil fail.
+            //            // We may as well use the ResolveAll<ResolveType> public
+            //            // method to do this.
+            //            var resolveAllMethod = this.GetType().GetMethod("ResolveAll", new Type[] { });
+            //            var genericResolveAllMethod = resolveAllMethod.MakeGenericMethod(type.GetGenericArguments()[0]);
+            //#else
+            //            var resolveAllMethods =    from member in this.GetType().GetMembers()
+            //                                       where member.MemberType == MemberTypes.Method
+            //                                       where member.Name == "ResolveAll"
+            //                                       let method = member as MethodInfo
+            //                                       where method.IsGenericMethod
+            //                                       let genericMethod = method.MakeGenericMethod(type.GetGenericArguments()[0])
+            //                                       where genericMethod.GetParameters().Count() == 0
+            //                                       select genericMethod;
 
-//            var genericResolveAllMethod = resolveAllMethods.First();
-//#endif
+            //            var genericResolveAllMethod = resolveAllMethods.First();
+            //#endif
             return genericResolveAllMethod.Invoke(this, new object[] { false });
         }
 
@@ -3114,11 +3145,11 @@ namespace TinyIoC
 
                 try
                 {
-                    args[parameterIndex] = parameters.ContainsKey(currentParam.Name) ? 
-                                            parameters[currentParam.Name] : 
+                    args[parameterIndex] = parameters.ContainsKey(currentParam.Name) ?
+                                            parameters[currentParam.Name] :
                                             ResolveInternal(
-                                                new TypeRegistration(currentParam.ParameterType), 
-                                                NamedParameterOverloads.Default, 
+                                                new TypeRegistration(currentParam.ParameterType),
+                                                NamedParameterOverloads.Default,
                                                 options);
                 }
                 catch (TinyIoCResolutionException ex)

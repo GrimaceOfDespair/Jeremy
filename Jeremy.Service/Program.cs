@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading;
 using Jeremy.Service.Configuration;
 using Jeremy.Service.Messaging;
 using Jeremy.Service.Workers;
@@ -34,6 +35,8 @@ namespace Jeremy.Service
       if (Debugger.IsAttached)
       {
         service.Run();
+
+        while (true) Thread.Sleep(int.MaxValue);
       }
       else
 #endif
@@ -49,11 +52,11 @@ namespace Jeremy.Service
       // Register configuration sections
       foreach (var section in Manager.Instance.GetSections())
       {
-        container.Register(section);
+        container.Register(section.GetType(), section);
       }
 
       // Register workers
-      container.AutoRegister(t => t is IWorker);
+      container.AutoRegister(t => typeof(IWorker).IsAssignableFrom(t));
 
       // Register queue
       container.Register<MessageQueue>().AsSingleton();

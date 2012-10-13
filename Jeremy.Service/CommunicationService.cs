@@ -20,8 +20,6 @@ namespace Jeremy.Service
     public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     protected readonly Dictionary<ManualResetEvent, IWorker> Runnables = new Dictionary<ManualResetEvent, IWorker>();
-    public ManualResetEvent StopEvent { get; set; }
-    protected int Timeout { get; set; }
 
     public CommunicationService(IEnumerable<IWorker> workers)
     {
@@ -33,14 +31,18 @@ namespace Jeremy.Service
       }
     }
 
-    protected override void OnStart(string[] args)
-    {
-      Run();
-    }
+    public readonly ManualResetEvent StopEvent = new ManualResetEvent(false);
+
+    protected int Timeout { get; set; }
 
     public bool IsStopping
     {
       get { return StopEvent.WaitOne(0); }
+    }
+
+    protected override void OnStart(string[] args)
+    {
+      Run();
     }
 
     protected override void OnStop()
@@ -64,6 +66,11 @@ namespace Jeremy.Service
 
       foreach (var runnable in Runnables)
       {
+        if (Log.IsDebugEnabled)
+        {
+          Log.Debug("Putting " + runnable.Value.GetType().Name + " to work");
+        }
+
         var run = runnable.Value;
         var @event = runnable.Key;
 

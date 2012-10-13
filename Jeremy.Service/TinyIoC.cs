@@ -26,6 +26,7 @@
 #define UNBOUND_GENERICS_GETCONSTRUCTORS    // Platform supports GetConstructors on unbound generic types
 #define GETPARAMETERS_OPEN_GENERICS         // Platform supports GetParameters on open generics
 
+using System.Collections;
 // CompactFramework / Windows Phone 7
 // By default does not support System.Linq.Expressions.
 // AppDomain object does not support enumerating all assemblies in the app domain.
@@ -2101,11 +2102,13 @@ namespace TinyIoC
     private class EnumerableFactory : ObjectFactoryBase
     {
       private readonly Type _elementType;
+      private readonly IEnumerable<Type> _implementations;
       private readonly Type _enumerableType;
 
-      public EnumerableFactory(Type elementType)
+      public EnumerableFactory(Type elementType, IEnumerable<Type> implementations)
       {
         _elementType = elementType;
+        _implementations = implementations;
         _enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
       }
 
@@ -2115,7 +2118,17 @@ namespace TinyIoC
       {
         try
         {
-          return container.ResolveAll(_elementType);
+          var listType = typeof (List<>).MakeGenericType(_elementType);
+          var constructor = listType.GetConstructor(Type.EmptyTypes);
+
+          var instances = constructor.Invoke(Type.EmptyTypes) as IList;
+          foreach (var implementationType in _implementations)
+          {
+            var instance = container.Resolve(implementationType);
+            instances.Add(instance);
+          }
+
+          return instances;
         }
         catch (Exception ex)
         {
@@ -2684,7 +2697,7 @@ namespace TinyIoC
           if (implementations.Count() > 1)
           {
             var enumerable = typeof(IEnumerable<>).MakeGenericType(type);
-            RegisterInternal(enumerable, string.Empty, new EnumerableFactory(type));
+            RegisterInternal(enumerable, string.Empty, new EnumerableFactory(type, implementations));
           }
         }
       }

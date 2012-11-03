@@ -17,7 +17,7 @@ namespace Jeremy.Service
 {
   public partial class CommunicationService : ServiceBase
   {
-    public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     protected readonly Dictionary<ManualResetEvent, IWorker> Runnables = new Dictionary<ManualResetEvent, IWorker>();
 

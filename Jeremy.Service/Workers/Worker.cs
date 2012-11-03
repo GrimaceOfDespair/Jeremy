@@ -11,7 +11,7 @@ namespace Jeremy.Service.Workers
 {
   public abstract class Worker : IWorker
   {
-    public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     private readonly int _interval;
 
@@ -34,8 +34,21 @@ namespace Jeremy.Service.Workers
           Log.Debug("Worker " + GetType().Name + " runs");
         }
 
-        // If action returns that is can wait, er... wait
-        if (Action() == NextAction.CanWait)
+        bool canWait;
+        try
+        {
+          canWait = Action() == NextAction.CanWait;
+        }
+        catch (Exception e)
+        {
+          if (Log.IsErrorEnabled)
+          {
+            Log.Error("Error while running", e);
+          }
+          canWait = true;
+        }
+
+        if (canWait)
         {
           stopEvent.WaitOne(_interval);
         }

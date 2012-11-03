@@ -7,15 +7,17 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using Jeremy.Service.Configuration;
+using Jeremy.Service.Live;
 using Jeremy.Service.Messaging;
 using Jeremy.Service.Workers;
+using MSNPSharp;
 using log4net;
 
 namespace Jeremy.Service
 {
   static class Program
   {
-    public static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     /// <summary>
     /// The main entry point for the application.
@@ -62,6 +64,8 @@ namespace Jeremy.Service
       container.Register<MessageQueue>().AsSingleton();
       container.Register<MessageFactory>().AsSingleton();
       container.Register<CommunicationService>().AsSingleton();
+      //container.Register<Messenger>().AsSingleton();
+      container.Register<MessengerService>().AsSingleton();
     }
   }
 }

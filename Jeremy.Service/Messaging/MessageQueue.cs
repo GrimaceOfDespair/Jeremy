@@ -24,6 +24,14 @@ namespace Jeremy.Service.Messaging
       }
     }
 
+    public Message Peek()
+    {
+      lock (_innerQueue)
+      {
+        return _innerQueue.Any() ? _innerQueue.Peek() : null;
+      }
+    }
+
     public Message Dequeue()
     {
       lock (_innerQueue)

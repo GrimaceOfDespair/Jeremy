@@ -38,6 +38,9 @@
     <Reference Include="log4net">
       <HintPath>..\packages\log4net.1.2.10\lib\2.0\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="MSNPSharp">
+      <HintPath>..\lib\MSNPSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -62,6 +65,7 @@
     <Compile Include="Configuration\MessageListenerSection.cs" />
     <Compile Include="Configuration\UdpListenerSection.cs" />
     <Compile Include="Configuration\WorkerSection.cs" />
+    <Compile Include="Live\MessengerService.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Messaging\MessageFactory.cs" />
     <Compile Include="TinyIoC.cs" />

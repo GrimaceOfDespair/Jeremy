@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jeremy.Service", "Jeremy.Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jeremy", "Jeremy\Jeremy.csproj", "{A7F986AB-42E6-4097-A3B9-7F4BC4A4F620}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jeremy.Console", "Jeremy.Console\Jeremy.Console.csproj", "{B34D40E0-40D0-425A-AE09-3A7C329F1022}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,15 @@ Global
 		{A7F986AB-42E6-4097-A3B9-7F4BC4A4F620}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A7F986AB-42E6-4097-A3B9-7F4BC4A4F620}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A7F986AB-42E6-4097-A3B9-7F4BC4A4F620}.Release|x86.ActiveCfg = Release|Any CPU
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Debug|x86.ActiveCfg = Debug|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Debug|x86.Build.0 = Debug|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Release|Any CPU.ActiveCfg = Release|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Release|Mixed Platforms.Build.0 = Release|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Release|x86.ActiveCfg = Release|x86
+		{B34D40E0-40D0-425A-AE09-3A7C329F1022}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
